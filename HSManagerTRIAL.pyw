@@ -15,6 +15,9 @@ def init():
 	with open("Filepath.txt", "w") as file:
 		file.write(game_path)
 
+	os.mkdir("Original")
+	os.mkdir("Modified")
+	
 	script_dir = os.getcwd()
 
 	dir = os.listdir(f"{script_dir}/Original")
