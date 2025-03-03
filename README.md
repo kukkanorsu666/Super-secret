@@ -1,1 +1,3 @@
-"# Super-secret" 
+```
+pip install pyglet ttkbootstrap
+```

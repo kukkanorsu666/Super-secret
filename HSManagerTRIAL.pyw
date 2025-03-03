@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter.filedialog import askdirectory
 from tkinter import font as tkFont
 import ttkbootstrap as ttk
+import webbrowser
 import ctypes
 import pyglet
 
@@ -17,6 +18,8 @@ def init():
 
 	os.mkdir("Original")
 	os.mkdir("Modified")
+	with open("settings.txt", "w") as file:
+			file.write("")
 	
 	script_dir = os.getcwd()
 
@@ -103,6 +106,28 @@ def launch():
 	except FileNotFoundError:
 		canvas.itemconfigure(swap, text = "Error: data.win not found in game directory!", fill = "red")
 
+def adfree():
+	window.geometry("600x400")
+	window.title("Hero Siege Manager PRO by Kukkanorsu666")
+
+donation = 0
+def ploxplox(event):
+	global donation
+	donation += 10
+	canvas.itemconfigure(swap, text = f"Thanks for donate {donation} €", fill = "green")
+	if donation >= 200:
+		with open("settings.txt", "w") as file:
+			file.write("Pro user = True")
+		adfree()
+
+def ad(event):
+	webbrowser.open('http://monday.com')
+
+def pro():
+	pro = open("settings.txt", "r")
+	x = pro.read()
+	if x == "Pro user = True":
+		adfree()
 
 #Bunch of dogshit
 pyglet.font.add_file('font/Fontin-Regular.ttf')
@@ -137,14 +162,12 @@ canvas = Canvas(window, width = 800, height = 400)
 canvas.pack(fill = "both", expand = True)
 
 canvas.create_image(0,0, image = background, anchor = "nw")
-canvas.create_image(300,400, image = plox, anchor = "s")
-canvas.create_image(800,0, image = banner_ad, anchor = "ne")
 
 #buttons
 button_style = ttk.Style()
 button_style.configure('TButton', font=('Fontin', 14))
-change_dir_button = ttk.Button(window, text = "Change", style = "warning, outline, ", command = change)
 
+change_dir_button = ttk.Button(window, text = "Change", style = "warning, outline, ", command = change)
 change_dir_button_window = canvas.create_window(300, 50, anchor = "c", window = change_dir_button)
 
 swap2unmodified_button = ttk.Button(window, text = "Load unmodified", bootstyle = "warning, outline", command = swap2unmodified)
@@ -156,6 +179,12 @@ swap2modified_button_window = canvas.create_window(400, 150, anchor = "c", windo
 launch_button = ttk.Button(window, text = "Launch editor", bootstyle = "warning, outline", command = launch)
 launch_button_window = canvas.create_window(300, 300, anchor = "c", window = launch_button)
 
+donate_button_window = canvas.create_image(300, 400, anchor = "s", image = plox)
+canvas.tag_bind(donate_button_window, "<Button-1>", ploxplox)
+
+ad_button_window = canvas.create_image(800, 0, anchor = "ne", image = banner_ad)
+canvas.tag_bind(ad_button_window, "<Button-1>", ad)
+
 #text widgets
 swap = canvas.create_text(300, 210, font = font_custom_label, fill = "White", text = "")
 
@@ -166,4 +195,5 @@ except:
 	data_win_path = canvas.create_text(300, 10, font = font_custom_label, fill = "White", text = f"data.win path:  {init()}")
 
 #Run
+pro()
 window.mainloop()
