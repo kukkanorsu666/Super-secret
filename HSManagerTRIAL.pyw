@@ -38,7 +38,6 @@ def init():
 
 	return game_path
 
-
 def change():
 	game_path = askdirectory(title='Select Folder')
 
@@ -64,7 +63,6 @@ def change():
 	with open("Filepath.txt", "w") as file:
 		file.write(game_path)
 
-
 def swap2unmodified():
 	script_dir = os.getcwd()
 	game_path = open("Filepath.txt", "r")
@@ -78,7 +76,6 @@ def swap2unmodified():
 	except:
 		canvas.itemconfigure(swap, text = "Error: Something went wrong!", fill = "red")
 
-
 def swap2modified():
 	script_dir = os.getcwd()
 	game_path = open("Filepath.txt", "r")
@@ -91,7 +88,6 @@ def swap2modified():
 
 	except:
 		canvas.itemconfigure(swap, text = "Error: Something went wrong!", fill = "red")
-
 
 def launch():
 	game_path = open("Filepath.txt", "r")
@@ -109,7 +105,7 @@ def launch():
 def adfree():
 	window.geometry("600x400")
 	window.title("Hero Siege Manager PRO by Kukkanorsu666")
-
+	
 donation = 0
 def ploxplox(event):
 	global donation
