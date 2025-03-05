@@ -112,7 +112,7 @@ def ploxplox(event):
 	global donation
 	donation += 10
 	canvas.itemconfigure(swap, text = f"Thanks for donate {donation} €", fill = "green")
-	if donation >= 200:
+	if donation >= 1000:
 		with open("settings.txt", "w") as file:
 			file.write("Pro user = True")
 		adfree()
