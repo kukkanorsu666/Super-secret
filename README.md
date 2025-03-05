@@ -1,3 +1,3 @@
 ```
-pip install pyglet ttkbootstrap
+pip install pyglet ttkbootstrap tendo
 ```
