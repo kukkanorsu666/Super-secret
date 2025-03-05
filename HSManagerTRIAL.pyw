@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter.filedialog import askdirectory
 from tkinter import font as tkFont
+from tendo import singleton
 import ttkbootstrap as ttk
 import webbrowser
 import ctypes
@@ -191,5 +192,6 @@ except:
 	data_win_path = canvas.create_text(300, 10, font = font_custom_label, fill = "White", text = f"data.win path:  {init()}")
 
 #Run
+me = singleton.SingleInstance()
 pro()
 window.mainloop()
