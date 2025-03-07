@@ -7,6 +7,7 @@ from tkinter.filedialog import askdirectory
 from tkinter import font as tkFont
 from tendo import singleton
 import ttkbootstrap as ttk
+import customtkinter
 import webbrowser
 import ctypes
 import pyglet
@@ -33,7 +34,6 @@ def init():
 		except:
 			print("Wrong folder")
 			canvas.itemconfigure(swap, text = "Error: data.win not found in this directory!", fill = "red")
-
 	else:
 		print("Unmodified file already saved.")
 
@@ -90,15 +90,20 @@ def swap2modified():
 	except:
 		canvas.itemconfigure(swap, text = "Error: Something went wrong!", fill = "red")
 
+def cooldown():
+	launch()
+	launch_button.config(state='disabled')
+	launch_button.after(4000, lambda: launch_button.config(state='active'))
+
 def launch():
 	game_path = open("Filepath.txt", "r")
 	x = game_path.read()
 	game_path_replace = x.replace("/","\\")
 	try:
 		os.startfile(rf"{game_path_replace}/data.win")
-		time.sleep(8)
+		#time.sleep(8)
 		swap2unmodified()
-		canvas.itemconfigure(swap, text = "Game is ready to be launched!", fill = "green")
+		canvas.after(2000, lambda: canvas.itemconfigure(swap, text = "Game is ready to be launched!", fill = "green"))
 
 	except FileNotFoundError:
 		canvas.itemconfigure(swap, text = "Error: data.win not found in game directory!", fill = "red")
@@ -131,6 +136,7 @@ pyglet.font.add_file('font/Fontin-Regular.ttf')
 pyglet.font.add_file('font/Fontin-Bold.ttf')
 myappid = '93769867239679234696'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 
 try:
 	game_path = open("Filepath.txt", "r")
@@ -167,23 +173,22 @@ banner_ad = PhotoImage(file = "images/banner1.png")
 #canvas config
 canvas = Canvas(window, width = 800, height = 400)
 canvas.pack(fill = "both", expand = True)
-
 canvas.create_image(0,0, image = background, anchor = "nw")
 
 #buttons
 button_style = ttk.Style()
 button_style.configure('TButton', font=('Fontin', 14))
 
-change_dir_button = ttk.Button(window, text = "Change", style = "warning, outline, ", command = change)
+change_dir_button = ttk.Button(window, text = "Change",takefocus=False, style = "warning, outline, ", command = change)
 change_dir_button_window = canvas.create_window(300, 50, anchor = "c", window = change_dir_button)
 
-swap2unmodified_button = ttk.Button(window, text = "Return unmodified", bootstyle = "warning, outline", command = swap2unmodified)
+swap2unmodified_button = ttk.Button(window, text = "Return unmodified",takefocus=False, style = "warning, outline", command = swap2unmodified)
 swap2unmodified_button_window = canvas.create_window(10, 390, anchor = "sw", window = swap2unmodified_button)
 
-swap2modified_button = ttk.Button(window, text = "Load modified", bootstyle = "warning, outline", command = swap2modified)
+swap2modified_button = ttk.Button(window, text = "Load modified", takefocus=False, style = "warning, outline", command = swap2modified)
 swap2modified_button_window = canvas.create_window(300, 150, anchor = "c", window = swap2modified_button)
 
-launch_button = ttk.Button(window, text = "Launch editor", bootstyle = "success, outline", command = launch)
+launch_button = ttk.Button(window, text = "Launch editor", takefocus=False, style = "success, outline", command = cooldown)
 launch_button_window = canvas.create_window(300, 260, anchor = "c", window = launch_button)
 
 donate_button_window = canvas.create_image(300, 400, anchor = "s", image = plox)
