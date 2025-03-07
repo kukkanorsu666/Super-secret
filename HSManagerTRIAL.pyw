@@ -177,14 +177,14 @@ button_style.configure('TButton', font=('Fontin', 14))
 change_dir_button = ttk.Button(window, text = "Change", style = "warning, outline, ", command = change)
 change_dir_button_window = canvas.create_window(300, 50, anchor = "c", window = change_dir_button)
 
-swap2unmodified_button = ttk.Button(window, text = "Load unmodified", bootstyle = "warning, outline", command = swap2unmodified)
-swap2unmodified_button_window = canvas.create_window(200, 150, anchor = "c", window = swap2unmodified_button)
+swap2unmodified_button = ttk.Button(window, text = "Return unmodified", bootstyle = "warning, outline", command = swap2unmodified)
+swap2unmodified_button_window = canvas.create_window(10, 390, anchor = "sw", window = swap2unmodified_button)
 
 swap2modified_button = ttk.Button(window, text = "Load modified", bootstyle = "warning, outline", command = swap2modified)
-swap2modified_button_window = canvas.create_window(400, 150, anchor = "c", window = swap2modified_button)
+swap2modified_button_window = canvas.create_window(300, 150, anchor = "c", window = swap2modified_button)
 
-launch_button = ttk.Button(window, text = "Launch editor", bootstyle = "warning, outline", command = launch)
-launch_button_window = canvas.create_window(300, 300, anchor = "c", window = launch_button)
+launch_button = ttk.Button(window, text = "Launch editor", bootstyle = "success, outline", command = launch)
+launch_button_window = canvas.create_window(300, 260, anchor = "c", window = launch_button)
 
 donate_button_window = canvas.create_image(300, 400, anchor = "s", image = plox)
 canvas.tag_bind(donate_button_window, "<Button-1>", ploxplox)
