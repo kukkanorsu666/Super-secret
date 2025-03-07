@@ -142,7 +142,17 @@ except:
 window = ttk.Window(themename = "darkly")
 window.title("Hero Siege Manager by Kukkanorsu666 (FREE TRIAL)")
 window.iconbitmap("images/icon.ico")
-window.geometry("800x400")
+
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 400
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+
+x = int((screen_width/2) - (WINDOW_WIDTH/2))
+y = int((screen_height/2) - (WINDOW_HEIGHT/2))
+
+window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}")
+print(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}")
 window.resizable(False, False)
 
 #font
