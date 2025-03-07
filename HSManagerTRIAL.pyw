@@ -1,13 +1,11 @@
 import os
 import time
 import shutil
-import tkinter as tk
 from tkinter import *
 from tkinter.filedialog import askdirectory
 from tkinter import font as tkFont
 from tendo import singleton
 import ttkbootstrap as ttk
-import customtkinter
 import webbrowser
 import ctypes
 import pyglet
