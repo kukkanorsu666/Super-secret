@@ -156,7 +156,6 @@ x = int((screen_width/2) - (WINDOW_WIDTH/2))
 y = int((screen_height/2) - (WINDOW_HEIGHT/2))
 
 window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}")
-print(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{x}+{y}")
 window.resizable(False, False)
 
 #font
