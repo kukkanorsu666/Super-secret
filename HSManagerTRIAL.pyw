@@ -99,7 +99,7 @@ def launch():
 	game_path_replace = x.replace("/","\\")
 	try:
 		os.startfile(rf"{game_path_replace}/data.win")
-		#time.sleep(8)
+		time.sleep(8)
 		swap2unmodified()
 		canvas.after(2000, lambda: canvas.itemconfigure(swap, text = "Game is ready to be launched!", fill = "green"))
 
