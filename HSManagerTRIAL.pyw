@@ -10,63 +10,80 @@ import filecmp
 import webbrowser
 import ctypes
 import pyglet
-import asyncio
+import threading
+
+myappid = '93769867239679234696'
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 def updater():
 	script_dir = os.getcwd()
-	game_path = open("Filepath.txt", "r")
+	with open("Filepath.txt", "r") as game_path:
+		game_path_str = game_path.read()
 	old_file = f"{script_dir}/Original/data.win"
-	new_file = f"{game_path.read()}/data.win"
-
-	if filecmp.cmp(old_file, new_file, shallow=False):
-		canvas.itemconfigure(updater_label, text = "Data file up to date!", fill = "green")
-		canvas.after(3000, lambda: canvas.itemconfigure(updater_label, text = "", fill = "green"))
-	else:
-		canvas.itemconfigure(updater_label, text = "Updating data.win...", fill = "orange")
-		shutil.copy(f"{new_file}",f"{script_dir}/Original")
-		canvas.after(3000, lambda: canvas.itemconfigure(updater_label, text = "Update complete", fill = "green"))
-		canvas.after(6000, lambda: canvas.itemconfigure(updater_label, text = "", fill = "green"))
+	new_file = f"{game_path_str}/data.win"
+	try:
+		if filecmp.cmp(old_file, new_file, shallow=False):
+			canvas.itemconfigure(updater_label, text = "Data file up to date!", fill = "green")
+			canvas.after(3000, lambda: canvas.itemconfigure(updater_label, text = "", fill = "green"))
+			canvas.itemconfigure(swap, text= "data.win found", fill = "green")
+			canvas.after(1500, lambda: canvas.itemconfigure(swap, text = ""))
+		else:
+			canvas.itemconfigure(swap, text= "data.win found", fill = "green")
+			canvas.after(2000, lambda: canvas.itemconfigure(swap, text = ""))
+			launch_modified_button.config(state='disabled')
+			launch_modified_button.after(3000, lambda: launch_modified_button.config(state='active'))
+			launch_unmodified_button.config(state='disabled')
+			launch_unmodified_button.after(3000, lambda: launch_unmodified_button.config(state='active'))
+			canvas.itemconfigure(updater_label, text = "Updating data.win...", fill = "orange")
+			shutil.copy(f"{new_file}",f"{script_dir}/Original")
+			canvas.after(3000, lambda: canvas.itemconfigure(updater_label, text = "Update complete", fill = "green"))
+			canvas.after(6000, lambda: canvas.itemconfigure(updater_label, text = "", fill = "green"))
+	except Exception as e:
+		canvas.itemconfigure(swap, text= "Error: data.win not found in this directory!", fill = "red")
+		print(f"updater() Error: {e}")
 		
 def init():
 	game_path = askdirectory(title='Where is data.win hiding?')
 	with open("Filepath.txt", "w") as file:
 		file.write(game_path)
 
-	os.mkdir("Original")
-	os.mkdir("Modified")
+	if not os.path.exists("Original"):
+		os.mkdir("Original")
+	if not os.path.exists("Modified"):
+		os.mkdir("Modified")
 	with open("settings.txt", "w") as file:
-			file.write("")
+		file.write("")
 	
 	script_dir = os.getcwd()
-	dir = os.listdir(f"{script_dir}/Original")
-
-	if len(dir) == 0:
+	path = (f"{script_dir}/Original")
+	file_name = "data.win"
+	file_path = os.path.join(path, file_name)
+	if os.path.isfile(file_path):
+		print("Unmodified file already saved.")
+	else:
 		try:
 			shutil.copy(f"{game_path}/data.win",f"{script_dir}/Original")
 			canvas.itemconfigure(swap, text = "data.win found!", fill = "green")
+			updater()
 		except:
 			print("Wrong folder")
 			canvas.itemconfigure(swap, text = "Error: data.win not found in this directory!", fill = "red")
-	else:
-		print("Unmodified file already saved.")
-
 	return game_path
 
 def change():
 	game_path = askdirectory(title='Select Folder')
-
 	script_dir = os.getcwd()
-
-	dir = os.listdir(f"{script_dir}/Original")
-
-	if len(dir) == 0:
+	path = (f"{game_path}")
+	file_name = "data.win"
+	file_path = os.path.join(path, file_name)
+	if os.path.isfile(file_path):
 		try:
 			shutil.copy(f"{game_path}/data.win",f"{script_dir}/Original")
 			canvas.itemconfigure(swap, text = "data.win found!", fill = "green")
 		except FileNotFoundError:
 			canvas.itemconfigure(swap, text = "Error: data.win not found in this directory!", fill = "red")
-		except:
-			canvas.itemconfigure(swap, text = "Error: Something went wrong!", fill = "red")
+		except Exception as e:
+			print(f"change() Error:{e}")
 	else:
 		print("Unmodified file already saved.")
 
@@ -74,13 +91,16 @@ def change():
 	
 	with open("Filepath.txt", "w") as file:
 		file.write(game_path)
+	updater()
 
 def swap2unmodified():
 	script_dir = os.getcwd()
-	game_path = open("Filepath.txt", "r")
+	with open("Filepath.txt", "r") as game_path:
+		game_path_str = game_path.read()
 	try:
-		shutil.copy(f"{script_dir}/Original/data.win", game_path.read())
-		canvas.itemconfigure(swap, text = "Unodified win.data loaded to game directory.", fill = "white")
+		shutil.copy(f"{script_dir}/Original/data.win", game_path_str)
+		canvas.itemconfigure(swap, text = "Unmodified win.data loaded to game directory.", fill = "white")
+		canvas.after(2000, lambda: canvas.itemconfigure(swap, text = "", fill = "green"))
 	except FileNotFoundError:
 		canvas.itemconfigure(swap, text = "Error: Unmodified file not found!", fill = "red")
 	except:
@@ -88,37 +108,80 @@ def swap2unmodified():
 
 def swap2modified():
 	script_dir = os.getcwd()
-	game_path = open("Filepath.txt", "r")
+	with open("Filepath.txt", "r") as game_path:
+		game_path_str = game_path.read()
 	try:
-		shutil.copy(f"{script_dir}/Modified/data.win", game_path.read())
+		shutil.copy(f"{script_dir}/Modified/data.win", game_path_str)
 		canvas.itemconfigure(swap, text = "Modified win.data loaded to game directory.", fill = "white")
 	except FileNotFoundError:
 		canvas.itemconfigure(swap, text = "Error: Modified file not found!", fill = "red")
-	except:
-		canvas.itemconfigure(swap, text = "Error: Something went wrong!", fill = "red")
+	except Exception as e:
+		canvas.itemconfigure(swap, text = f"Error: {e}!", fill = "red")
 
-def cooldown():
-	launch_button.config(state='disabled')
-	launch_button.after(4000, lambda: launch_button.config(state='active'))
-	launch()
+sleep_event = threading.Event()
 
-def launch():
-	game_path = open("Filepath.txt", "r")
-	x = game_path.read()
+def sleep_func():
+	sleep_event.set()
+	time.sleep(6)
+	swap2unmodified()
+	sleep_event.clear()
+
+def sleep_thread():
+	if not sleep_event.is_set():
+		threading.Thread(target=sleep_func, daemon=True).start()
+
+def cooldown_modified():
+	launch_modified_button.config(state='disabled')
+	launch_modified_button.after(2000, lambda: launch_modified_button.config(state='active'))
+	launch_unmodified_button.config(state='disabled')
+	launch_unmodified_button.after(2000, lambda: launch_unmodified_button.config(state='active'))
+	launch_modified()
+
+def launch_modified():
+	script_dir = os.getcwd()
+	path = (f"{script_dir}/Modified")
+	file_name = "data.win"
+	file_path = os.path.join(path, file_name)
+	if os.path.isfile(file_path):
+		swap2modified()
+	else:
+		canvas.itemconfigure(swap, text = "Error: Modified file not found!", fill = "red")
+		return
+	with open("Filepath.txt", "r") as game_path:
+		x = game_path.read()
 	game_path_replace = x.replace("/","\\")
 	try:
 		os.startfile(rf"{game_path_replace}/data.win")
-		time.sleep(8)
-		swap2unmodified()
+		sleep_thread()
+		canvas.after(2000, lambda: canvas.itemconfigure(swap, text = "Game is ready to be launched!", fill = "green"))
+	except FileNotFoundError:
+		canvas.itemconfigure(swap, text = "Error: data.win not found in game directory!", fill = "red")
+
+def cooldown_unmodified():
+	launch_unmodified_button.config(state='disabled')
+	launch_unmodified_button.after(2000, lambda: launch_unmodified_button.config(state='active'))
+	launch_modified_button.config(state='disabled')
+	launch_modified_button.after(2000, lambda: launch_modified_button.config(state='active'))
+	launch_unmodified()
+
+def launch_unmodified():
+	swap2unmodified()
+	with open("Filepath.txt", "r") as game_path:
+		x = game_path.read()
+	game_path_replace = x.replace("/","\\")
+	try:
+		os.startfile(rf"{game_path_replace}/data.win")
 		canvas.after(2000, lambda: canvas.itemconfigure(swap, text = "Game is ready to be launched!", fill = "green"))
 	except FileNotFoundError:
 		canvas.itemconfigure(swap, text = "Error: data.win not found in game directory!", fill = "red")
 
 def adfree():
+	canvas.delete(ad_button_window)
 	window.geometry("600x400")
 	window.title("Hero Siege Manager PRO by Kukkanorsu666")
 
 donation = 0
+
 def ploxplox(event):
 	global donation
 	donation += 10
@@ -132,16 +195,14 @@ def ad(event):
 	webbrowser.open('http://monday.com')
 
 def pro():
-	pro = open("settings.txt", "r")
-	x = pro.read()
+	with open("settings.txt", "r") as pro:
+		x = pro.read()
 	if x == "Pro user = True":
 		adfree()
 
 #Bunch of dogshit
 pyglet.font.add_file('font/Fontin-Regular.ttf')
 pyglet.font.add_file('font/Fontin-Bold.ttf')
-myappid = '93769867239679234696'
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 try:
 	game_path = open("Filepath.txt", "r")
@@ -186,14 +247,11 @@ button_style.configure('TButton', font=('Fontin', 14))
 change_dir_button = ttk.Button(window, text = "Change",takefocus=False, style = "warning, outline, ", command = change)
 change_dir_button_window = canvas.create_window(300, 50, anchor = "c", window = change_dir_button)
 
-swap2unmodified_button = ttk.Button(window, text = "Return unmodified",takefocus=False, style = "warning, outline", command = swap2unmodified)
-swap2unmodified_button_window = canvas.create_window(10, 390, anchor = "sw", window = swap2unmodified_button)
+launch_modified_button = ttk.Button(window, text = "Launch editor (modified)", takefocus=False, style = "success, outline", command = cooldown_modified)
+launch_modified_button_window = canvas.create_window(150, 220, anchor = "c", window = launch_modified_button)
 
-swap2modified_button = ttk.Button(window, text = "Load modified", takefocus=False, style = "warning, outline", command = swap2modified)
-swap2modified_button_window = canvas.create_window(300, 150, anchor = "c", window = swap2modified_button)
-
-launch_button = ttk.Button(window, text = "Launch editor", takefocus=False, style = "success, outline", command = cooldown)
-launch_button_window = canvas.create_window(300, 260, anchor = "c", window = launch_button)
+launch_unmodified_button = ttk.Button(window, text = "Launch editor (original)", takefocus=False, style = "success, outline", command = cooldown_unmodified)
+launch_unmodified_button_window = canvas.create_window(450, 220, anchor = "c", window = launch_unmodified_button)
 
 donate_button_window = canvas.create_image(300, 400, anchor = "s", image = plox)
 canvas.tag_bind(donate_button_window, "<Button-1>", ploxplox)
@@ -202,7 +260,7 @@ ad_button_window = canvas.create_image(800, 0, anchor = "ne", image = banner_ad)
 canvas.tag_bind(ad_button_window, "<Button-1>", ad)
 
 #text widgets
-swap = canvas.create_text(300, 210, font = font_custom_label, fill = "White", text = "")
+swap = canvas.create_text(300, 170, font = font_custom_label, fill = "White", text = "")
 updater_label = canvas.create_text(500, 380, font = font_custom_label, fill = "White", text = "")
 
 try:
@@ -215,4 +273,5 @@ except:
 me = singleton.SingleInstance()
 updater()
 pro()
+window.iconbitmap("images/icon.ico")
 window.mainloop()
